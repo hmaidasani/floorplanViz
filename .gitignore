@@ -1,0 +1,6 @@
+.DS_Store
+.settings.xml
+.settings
+*.swp
+node_modules/
+tmp/

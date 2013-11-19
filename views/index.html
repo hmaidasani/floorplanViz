@@ -1,0 +1,27 @@
+<h1>{{title}} using handlebars</h1>
+<ul id="stores">
+  {{#each stores}}
+  <li>{{this.name}}</li>
+  {{/each}}
+</ul>
+<h1>{{title}} using ajax</h1>
+<ul id="storesAjax">
+</ul>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+<script type="text/javascript">
+	var url = "/getData";
+	var params = "type=stores";
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("POST", url, true);
+	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xmlhttp.onreadystatechange = function() {//Call a function when the state changes.
+	    if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	        var storesObj = JSON.parse(xmlhttp.responseText);
+	        for(var i in storesObj) {
+	        	$('<li class="store">').text(storesObj[i].name).appendTo($('#storesAjax'))
+	        }
+	    }
+	}
+	xmlhttp.send(params);
+</script>
+
