@@ -37,10 +37,9 @@ app.get('/', routes.index);
 var getDataRoute = require('./routes/getData');
 app.post('/getData', getDataRoute.getData);
 
+//allowing cross-origin resourse sharing
 app.get('/getData', cors(), getDataRoute.getData);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
-
-exports = app;
