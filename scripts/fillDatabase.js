@@ -84,8 +84,14 @@ function insertNumCustomers (howManyDays) {
 	pg.connect(process.env.DATABASE_URL || 'postgres://localhost:5432/floorplanviz', function(err, client) {
 		client.on('drain', client.end.bind(client));
 		client.query('drop table storecustomers;', function(err, result) {
+			if(err)
+				console.log(err);
 			client.query('create table storecustomers(id serial primary key, number integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
+				if(err)
+					console.log(err);
 				client.query('truncate table storecustomers;', function(err, result) {
+					if(err)
+						console.log(err);
 					var iter = moment().subtract('days', howManyDays).twix(moment()).iterate("days");
 					var date, time, number;
 					while(iter.hasNext()) {
