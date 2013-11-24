@@ -66,12 +66,13 @@ parameters: howManyDays - days of data to create
 */
 function insertNumCustomers (howManyDays) {
 	pg.connect(process.env.DATABASE_URL || 'postgres://localhost:5432/floorplanviz', function(err, client) {
-		var query = client.query('drop table storecustomers;', function(err, result) {
+		 client.on('drain', client.end.bind(client));
+		// var query = client.query('drop table storecustomers;', function(err, result) {
 			
-		});
-		query = client.query('create table storecustomers(id serial primary key, number integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
+		// });
+		// query = client.query('create table storecustomers(id serial primary key, number integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
 			
-		});
+		// });
 
 		var iter = moment().subtract('days', howManyDays).twix(moment()).iterate("days");
 		var date, time, number;
@@ -96,12 +97,13 @@ parameters: howManyDays - days of data to create
 */
 function insertProfits (howManyDays) {
 	pg.connect(process.env.DATABASE_URL || 'postgres://localhost:5432/floorplanviz', function(err, client) {
-		var query = client.query('drop table storeprofits;', function(err, result) {
+		 client.on('drain', client.end.bind(client));
+		// var query = client.query('drop table storeprofits;', function(err, result) {
 			
-		});
-		query = client.query('create table storeprofits(id serial primary key, profit integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
+		// });
+		// query = client.query('create table storeprofits(id serial primary key, profit integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
 			
-		});
+		// });
 
 		var iter = moment().subtract('days', howManyDays).twix(moment()).iterate("days");
 		var date, time, profit;
@@ -119,6 +121,6 @@ function insertProfits (howManyDays) {
 
 			}
 		}
-		query.on('end', function() { client.end(); });
+		
 	});
 }
