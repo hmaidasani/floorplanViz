@@ -9,8 +9,8 @@ main();
 
 function main() {
 	// insertStores();
-	insertNumCustomers(1);
-	insertProfits(1);
+	insertNumCustomers(60);
+	insertProfits(60);
 }
 
 
