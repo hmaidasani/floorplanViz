@@ -12,9 +12,9 @@ function main() {
 	var args = process.argv.splice(2);
 	var days = parseInt(args[0]);
 	if(days > 0 && days <= 30){
-		// insertStoresAndData(days);
-		insertNumCustomers(days);
-		insertProfits(days);
+		// insertStoresAndData(days-1);
+		insertNumCustomers(days-1);
+		insertProfits(days-1);
 	} else{
 		console.log("Please run script with a days argument.");
 		console.log("Command should be: \"node fillDatabase.js <days>\".");
@@ -97,8 +97,8 @@ function insertNumCustomers (howManyDays) {
 					while(iter.hasNext()) {
 						date = iter.next();
 						for(var hour = 9; hour <= 22; hour++){
+							var time = date.year() + "-" + (date.month()*1+1) + "-" + date.date() + " " + hour + ':00';
 							for(var i in stores) {
-								var time = date.year() + "-" + date.month() + "-" + date.date() + " " + hour + ':00';
 								number = Math.floor((Math.random()*100)+1);
 								client.query('insert into storecustomers (store_id, number, time) values ('+ (i*1+1) +',' + number + ',\'' + time  +'\');', function(err, result) {
 								});
@@ -132,8 +132,8 @@ function insertProfits (howManyDays) {
 					while(iter.hasNext()) {
 						date = iter.next();
 						for(var hour = 9; hour <= 22; hour++){
+							var time = date.year() + "-" + (date.month()*1+1) + "-" + date.date() + " " + hour + ':00';
 							for(var i in stores) {
-								time = date.year() + "-" + date.month() + "-" + date.date() + " " + hour + ':00';
 								profit = Math.floor(Math.random() * (max - min + 1)) + min;
 								query = client.query('insert into storeprofits (store_id, profit, time) values ('+ (i*1+1) +',' + profit + ',\'' + time  +'\');', function(err, result) {
 								});

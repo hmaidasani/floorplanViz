@@ -9,6 +9,7 @@
     "express": "3.x",
     "pg": "2.x",
     "express3-handlebars": "~0.5.0",
-    "cors": "~2.1.0"
+    "cors": "~2.1.0",
+    "moment": "~2.4.0"
   }
 }
