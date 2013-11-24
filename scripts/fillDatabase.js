@@ -87,9 +87,9 @@ function insertNumCustomers (howManyDays) {
 			if(err)
 				console.log(err);
 			client.query('create table storecustomers(id serial primary key, number integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
-				if(err)
-					console.log(err);
-				client.query('truncate table storecustomers;', function(err, result) {
+				// if(err)
+				// 	console.log(err);
+				// client.query('truncate table storecustomers cascade;', function(err, result) {
 					if(err)
 						console.log(err);
 					var iter = moment().subtract('days', howManyDays).twix(moment()).iterate("days");
@@ -106,7 +106,7 @@ function insertNumCustomers (howManyDays) {
 
 						}
 					}
-				});
+				// });
 			});
 		});
 		
@@ -124,7 +124,7 @@ function insertProfits (howManyDays) {
 		client.on('drain', client.end.bind(client));
 		client.query('drop table storeprofits;', function(err, result) {
 			client.query('create table storeprofits(id serial primary key, profit integer, store_id integer, foreign key(store_id) references stores(id), time timestamp);', function(err, result) {
-				client.query('truncate table storeprofits;', function(err, result) {
+				// client.query('truncate table storeprofits cascade;', function(err, result) {
 					var iter = moment().subtract('days', howManyDays).twix(moment()).iterate("days");
 					var date, time, profit;
 					var min = 500;
@@ -141,7 +141,7 @@ function insertProfits (howManyDays) {
 
 						}
 					}
-				});
+				// });
 			});
 		});
 	});
