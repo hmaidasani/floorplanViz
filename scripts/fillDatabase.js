@@ -8,7 +8,16 @@ main();
 
 
 function main() {
-	// insertStores();
+	var args = process.argv.splice(2);
+	var days = parseInt(args[0]);
+	if(days > 0 && days <= 30){
+		console.log(days);
+	} else{
+		console.log("Please run script with a days argument.");
+		console.log("Command should be: \"node fillDatabase.js <days>\".");
+		console.log("Ensure that the days argument is greater than 0 and less than or equal to 30.")
+	}
+	insertStores();
 	insertNumCustomers(30);
 	insertProfits(30);
 }
