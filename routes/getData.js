@@ -57,7 +57,7 @@ var dayColumnsIds = {
     4:4,
     5:5,
     6:6,
-    0:7
+    7:7
 };
 
 var monthColumns = [
@@ -227,6 +227,7 @@ function binData(rows, timeType, stores) {
 			break;
 		case "day":
 			for(var i in rows) {
+				console.log(rows[i]);
 				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]]) {
 					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]] += rows[i].value;
 					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[rows[i].day]]++;
