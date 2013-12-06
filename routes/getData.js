@@ -118,6 +118,8 @@ function sendStoresData(req, res) {
 		case "month":
 			output["columns"] = monthColumns;
 			break;
+		case "all":
+			break;
 		default:
 			output["columns"] = "timeType parameter not specified";
 	}
@@ -158,12 +160,15 @@ function sendStoresData(req, res) {
 		    		console.log(result.rows);
 		    		var binnedData = binData(result.rows, timeType, stores);
 		    		var results = [];
+		    		
 		    		for(var i in binnedData){
-		    			for(var j in binnedData[i]){
-		    				if(j.indexOf('count') == -1){
-		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
-		    				}
-		    			}
+		    			if(timeType !== "all") {
+		    				for(var j in binnedData[i]){
+			    				results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
+			    			}
+		    			} else{
+		    				results.push({"store":parseInt(i), "value":(binnedData[i]) });
+			    		}
 		    		}
 		    		output["values"] = results;
 
@@ -186,12 +191,15 @@ function sendStoresData(req, res) {
 		    		if(err) return console.error(err);
 		    		var binnedData = binData(result.rows, timeType, stores);
 		    		var results = [];
+		    		
 		    		for(var i in binnedData){
-		    			for(var j in binnedData[i]){
-		    				if(j.indexOf('count') == -1){
-		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
-		    				}
-		    			}
+		    			if(timeType !== "all") {
+		    				for(var j in binnedData[i]){
+			    				results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
+			    			}
+		    			} else{
+		    				results.push({"store":parseInt(i), "value":(binnedData[i]) });
+			    		}
 		    		}
 		    		output["values"] = results;
 
@@ -216,12 +224,10 @@ function binData(rows, timeType, stores) {
 			for(var i in rows) {
 				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][hourColumnsIds[moment(rows[i].time).hour()]]) {
 					storeToTimeBins[stores[rows[i].name]][hourColumnsIds[moment(rows[i].time).hour()]] += rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+hourColumnsIds[moment(rows[i].time).hour()]]++;
 				} else {
 					if(!storeToTimeBins[stores[rows[i].name]])
 						storeToTimeBins[stores[rows[i].name]] = {};
 					storeToTimeBins[stores[rows[i].name]][hourColumnsIds[moment(rows[i].time).hour()]] =  rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+hourColumnsIds[moment(rows[i].time).hour()]] = 1;
 				}	
 			}
 			break;
@@ -230,12 +236,10 @@ function binData(rows, timeType, stores) {
 				console.log(rows[i]);
 				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]]) {
 					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]] += rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[rows[i].day]]++;
 				} else {
 					if(!storeToTimeBins[stores[rows[i].name]])
 						storeToTimeBins[stores[rows[i].name]] = {};
 					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]] =  rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[rows[i].day]] = 1;
 				}	
 			}
 			break;
@@ -243,14 +247,22 @@ function binData(rows, timeType, stores) {
 			for(var i in rows) {
 				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][moment(rows[i].time).month()+1]) {
 					storeToTimeBins[stores[rows[i].name]][moment(rows[i].time).month()+1] += rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+(moment(rows[i].time).month()*1+1)]++;
 				} else {
 					if(!storeToTimeBins[stores[rows[i].name]])
 						storeToTimeBins[stores[rows[i].name]] = {};
-					storeToTimeBins[stores[rows[i].name]][moment(rows[i].time).month()+1] =  rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+(moment(rows[i].time).month()*1+1)] = 1;
+					storeToTimeBins[stores[rows[i].name]][moment(rows[i].time).month()+1] =  rows[i].value;					
 				}	
 			}
+			break;
+		case "all":
+			for(var i in rows) {
+				if(storeToTimeBins[stores[rows[i].name]]) {
+					storeToTimeBins[stores[rows[i].name]] += rows[i].value;
+				} else {
+					storeToTimeBins[stores[rows[i].name]] =  rows[i].value;
+				}	
+			}
+			console.log(storeToTimeBins);
 			break;
 		default:
 			break;
