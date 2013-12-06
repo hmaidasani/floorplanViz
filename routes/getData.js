@@ -93,8 +93,19 @@ function sendStoresData(req, res) {
 	var output = {};
 	var name = req.body.name || req.query.name;
 	var timeType = req.body.timeType || req.query.timeType;
-	var time1 = req.body.time1 || req.query.time1;
-	var time2 = req.body.time2 || req.query.time2;
+	var hour1 = req.body.hour1 || req.query.hour1;
+	var hour2 = req.body.hour2 || req.query.hour2;
+	var day1 = req.body.day1 || req.query.day1;
+	var day2 = req.body.day2 || req.query.day2;
+	var month1 = req.body.month1 || req.query.month1;
+	var month2 = req.body.month2 || req.query.month2;
+
+	if(!hour1 || !hour2 || !day1 || !day2 || !month1 || !month2) {
+		output["values"] = "provide time hour1, hour2, day1, day2, month1, month2 parameters";
+		res.json(output);
+	}
+
+	
 	var value = req.body.value || req.query.value;
 	switch(timeType)
 	{
@@ -129,16 +140,12 @@ function sendStoresData(req, res) {
 		    	stores[result.rows[i].store] = i*1+1;
 		    }
 		    
-		    if(value == 'customers' && (time1 || time2)) {
-		    	var time1Moment = moment(time1);
-		    	var time2Moment = moment(time2);
-		    	var time = time1Moment.year()+'-'
-		    	if(time1 && time2)
-		    		queryString = "select number as value, time, name from storecustomers inner join stores on storecustomers.store_id = stores.id where time >= \'" + time1Moment.format("YYYY-MM-DD HH:00") +"\' and time <= \'" + time2Moment.format("YYYY-MM-DD HH:00") +"\'";
-		    	else if(time1)
-		    		queryString = "select number as value, time, name from storecustomers inner join stores on storecustomers.store_id = stores.id where time = \'" + time1Moment.format("YYYY-MM-DD HH:00") +"\'";
-		    	else if(time1)
-		    		queryString = "select number as value, time, name from storecustomers inner join stores on storecustomers.store_id = stores.id where time = \'" + time2Moment.format("YYYY-MM-DD HH:00") +"\'";
+		    if(value == 'customers') {
+		    	queryString = "select number as value, name, hour, day, month, time from storecustomers inner join stores on storecustomers.store_id = stores.id where";
+				queryString += ' hour between ' + hour1 + ' and ' + hour2;
+				queryString += ' AND day between ' + day1 + ' and ' + day2;
+				queryString += ' AND month between ' + month1 + ' and ' + month2;
+
 		    	if(name == 'all' || name === undefined)
 		    		queryString += '';
 		    	else
@@ -148,12 +155,13 @@ function sendStoresData(req, res) {
 		    	client.query(queryString, function(err, result) {
 		    		done();
 		    		if(err) return console.error(err);
+		    		console.log(result.rows);
 		    		var binnedData = binData(result.rows, timeType, stores);
 		    		var results = [];
 		    		for(var i in binnedData){
 		    			for(var j in binnedData[i]){
 		    				if(j.indexOf('count') == -1){
-		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]/binnedData[i]['count'+j]), "time": parseInt(j)});
+		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
 		    				}
 		    			}
 		    		}
@@ -161,16 +169,12 @@ function sendStoresData(req, res) {
 
 		    		res.json(output);
 		    	});
-		    } else if(value == 'profit' && (time1 || time2)) {
-		    	var time1Moment = moment(time1);
-		    	var time2Moment = moment(time2);
-		    	var time = time1Moment.year()+'-'
-		    	if(time1 && time2)
-		    		queryString = "select profit as value, time, name from storeprofits inner join stores on storeprofits.store_id = stores.id where time >= \'" + time1Moment.format("YYYY-MM-DD HH:00") +"\' and time <= \'" + time2Moment.format("YYYY-MM-DD HH:00") +"\'";
-		    	else if(time1)
-		    		queryString = "select profit as value, time, name from storeprofits inner join stores on storeprofits.store_id = stores.id where time = \'" + time1Moment.format("YYYY-MM-DD HH:00") +"\'";
-		    	else if(time1)
-		    		queryString = "select profit as value, time, name from storeprofits inner join stores on storeprofits.store_id = stores.id where time = \'" + time2Moment.format("YYYY-MM-DD HH:00") +"\'";
+		    } else if(value == 'profit') {
+		    	queryString = "select profit as value, name, hour, day, month, time from storeprofits inner join stores on storeprofits.store_id = stores.id where";
+				queryString += ' hour between ' + hour1 + ' and ' + hour2;
+				queryString += ' AND day between ' + day1 + ' and ' + day2;
+				queryString += ' AND month between ' + month1 + ' and ' + month2;
+
 		    	if(name == 'all' || name === undefined)
 		    		queryString += '';
 		    	else
@@ -185,7 +189,7 @@ function sendStoresData(req, res) {
 		    		for(var i in binnedData){
 		    			for(var j in binnedData[i]){
 		    				if(j.indexOf('count') == -1){
-		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]/binnedData[i]['count'+j]), "time": parseInt(j)});
+		    					results.push({"store":parseInt(i), "value":(binnedData[i][j]), "time": parseInt(j)});
 		    				}
 		    			}
 		    		}
