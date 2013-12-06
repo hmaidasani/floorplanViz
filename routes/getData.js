@@ -198,7 +198,7 @@ function sendStoresData(req, res) {
 		    		res.json(output);
 		    	});
 		    } else {
-		    	output["values"] = "provide time time1 or time2 parameters";
+		    	output["values"] = "invalid value parameter";
 		    	res.json(output);
 		    }
 		    
@@ -261,7 +261,7 @@ function binData(rows, timeType, stores) {
 
 
 function sendPathData(req, res) {
-	// select * from shoppingdurations where hour between 15 and 20 and day between 4 and 7 and month between 4 and 4;
+	var output = {};
 	var hour1 = req.body.hour1 || req.query.hour1;
 	var hour2 = req.body.hour2 || req.query.hour2;
 	var day1 = req.body.day1 || req.query.day1;
@@ -271,45 +271,48 @@ function sendPathData(req, res) {
 
 	if(!hour1 || !hour2 || !day1 || !day2 || !month1 || !month2) res.json({});
 	
-	var queryString = 'SELECT * FROM shoppingdurations where';
-	queryString += ' hour between ' + hour1 + ' and ' + hour2;
-	queryString += ' AND day between ' + day1 + ' and ' + day2;
-	queryString += ' AND month between ' + month1 + ' and ' + month2;
-	console.log(queryString);
-	var storePaths = {};
-	var output = [];
+	var queryString = 'SELECT name as store FROM stores';
+
 	var pg = require('pg'); 
 	pg.connect(process.env.DATABASE_URL || 'postgres://localhost:5432/floorplanviz', function(err, client, done) {
 		client.query(queryString, function(err, result) {
 		    done();
 		    if(err) return console.error(err);
-
-		    for(var i in result.rows) {
-		    	console.log(result.rows[i]);
-		    	console.log(result.rows[i]['store_id']);
-		    	console.log(result.rows[i]['laststore_id']);
-		    	if (storePaths[result.rows[i]['laststore_id']] && 
-		    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']]) {
-		    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']]++;
-		    	} else {
-		    		if(!storePaths[result.rows[i]['laststore_id']])
-		    			storePaths[result.rows[i]['laststore_id']] = {};
-		    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']] = 1;
-		    	}
-		    }
-		    console.log(storePaths);
 		    
-		    for(var start in storePaths) {
-		    	console.log(start);
-		    	console.log(storePaths[start]);
-		    	for(var end in storePaths[start]) {
-		    		console.log(end);
-		    		console.log(storePaths[start][end]);
-		    		output.push({"start":start, "end":end, "value":storePaths[start][end]})
-		    	}
-		    }
+		    output["stores"] = result.rows;
+			queryString = 'SELECT * FROM shoppingdurations where';
+			queryString += ' hour between ' + hour1 + ' and ' + hour2;
+			queryString += ' AND day between ' + day1 + ' and ' + day2;
+			queryString += ' AND month between ' + month1 + ' and ' + month2;
+			console.log(queryString);
+			var storePaths = {};
+			var paths = [];
+			var pg = require('pg'); 
+			pg.connect(process.env.DATABASE_URL || 'postgres://localhost:5432/floorplanviz', function(err, client, done) {
+				client.query(queryString, function(err, result) {
+				    done();
+				    if(err) return console.error(err);
 
-		    res.json({"paths":output});
+				    for(var i in result.rows) {
+				    	if (storePaths[result.rows[i]['laststore_id']] && 
+				    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']]) {
+				    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']]++;
+				    	} else {
+				    		if(!storePaths[result.rows[i]['laststore_id']])
+				    			storePaths[result.rows[i]['laststore_id']] = {};
+				    		storePaths[result.rows[i]['laststore_id']][result.rows[i]['store_id']] = 1;
+				    	}
+				    }
+
+				    for(var start in storePaths) {
+				    	for(var end in storePaths[start]) {
+				    		paths.push({"start":start, "end":end, "value":storePaths[start][end]})
+				    	}
+				    }
+				    output["paths"] = paths;
+				    res.json(output);
+				});
+			});
 		});
 	});
 }
