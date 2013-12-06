@@ -227,14 +227,14 @@ function binData(rows, timeType, stores) {
 			break;
 		case "day":
 			for(var i in rows) {
-				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][dayColumnsIds[moment(rows[i].time).day()]]) {
-					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[moment(rows[i].time).day()]] += rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[moment(rows[i].time).day()]]++;
+				if(storeToTimeBins[stores[rows[i].name]] && storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]]) {
+					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]] += rows[i].value;
+					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[rows[i].day]]++;
 				} else {
 					if(!storeToTimeBins[stores[rows[i].name]])
 						storeToTimeBins[stores[rows[i].name]] = {};
-					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[moment(rows[i].time).day()]] =  rows[i].value;
-					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[moment(rows[i].time).day()]] = 1;
+					storeToTimeBins[stores[rows[i].name]][dayColumnsIds[rows[i].day]] =  rows[i].value;
+					storeToTimeBins[stores[rows[i].name]]['count'+dayColumnsIds[rows[i].day]] = 1;
 				}	
 			}
 			break;
